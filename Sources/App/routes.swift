@@ -2,13 +2,12 @@ import Fluent
 import Vapor
 
 func routes(_ app: Application) throws {
-    app.get { req async throws in
-        try await req.view.render("index", ["title": "Hello Vapor!"])
-    }
+  let unprotectedAPI = app.grouped("api")
+  try unprotectedAPI.grouped("auth", "siwa").register(collection: SIWAAPIController())
 
-    app.get("hello") { req async -> String in
-        "Hello, world!"
-    }
+  let tokenProtectedAPI = unprotectedAPI.grouped(Token.authenticator())
+  try tokenProtectedAPI.grouped("users").register(collection: UserAPIController())
 
-    try app.register(collection: TodoController())
+  let unprotectedWeb = app.grouped("web")
+  try unprotectedWeb.grouped("auth", "siwa").register(collection: SIWAViewController())
 }

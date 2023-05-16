@@ -1,4 +1,4 @@
-// swift-tools-version:5.8
+// swift-tools-version:5.7.1
 import PackageDescription
 
 let package = Package(
@@ -11,6 +11,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", from: "4.76.0"),
         .package(url: "https://github.com/vapor/fluent.git", from: "4.8.0"),
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.0.0"),
+        .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0-rc"),
         .package(url: "https://github.com/vapor/leaf.git", from: "4.0.0"),
     ],
     targets: [
@@ -19,6 +20,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
+                .product(name: "JWT", package: "jwt"),
                 .product(name: "Leaf", package: "leaf"),
                 .product(name: "Vapor", package: "vapor")
             ],
