@@ -23,7 +23,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateUser())
     app.migrations.add(CreateToken())
     
-    app.migrations.add(CreateOrder())
+    app.migrations.add(CreateItem())
     app.migrations.add(CreateGroup())
     try await app.autoMigrate().get()
 

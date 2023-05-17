@@ -9,16 +9,17 @@ import Fluent
 
 struct CreateLocation: AsyncMigration {
     func prepare(on database: Database) async throws {
-        try await database.schema("locations")
+        try await database.schema(Location.schema)
             .id()
             .field("discription", .string, .required)
             .field("long", .double, .required)
             .field("lat", .double, .required)
-            .field("created_at", .date, .required)
+            .field("updatedAt", .string)
+            .field("createdAt", .string)
             .create()
     }
 
     func revert(on database: Database) async throws {
-        try await database.schema("user").delete()
+        try await database.schema(Location.schema).delete()
     }
 }

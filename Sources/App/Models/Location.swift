@@ -23,8 +23,11 @@ final class Location: Model {
     @Field(key: "lat")
     var lat: Double
     
-    @Timestamp(key: "created_at", on: .create)
-       var createdAt: Date?
+    @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
+    var updatedAt: Date?
+    
+    @Timestamp(key: "createdAt", on: .create, format: .iso8601)
+    var createdAt: Date?
 
     @Children(for: \.$location)
     var users: [User]
@@ -34,11 +37,13 @@ final class Location: Model {
     init(id: UUID? = nil,discription: String,
          long: Double,
          lat: Double,
-         createdAt: Date?) {
+         updatedAt: Date? = nil,
+         createdAt: Date? = nil) {
         self.id = id
         self.discription = discription
         self.lat = lat
         self.long = long
+        self.updatedAt = updatedAt
         self.createdAt = createdAt
     }
 }

@@ -17,6 +17,7 @@ struct CreateUser: AsyncMigration {
             .field("phone", .string)
             .field("location_id", .uuid, .references("locations", "id"))
             .field("appleUserIdentifier", .string, .required)
+            .field("updatedAt", .string)
             .field("createdAt", .string)
             .create()
     }

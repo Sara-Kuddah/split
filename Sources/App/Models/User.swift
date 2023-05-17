@@ -36,6 +36,10 @@ final class User: Model {
     @Field(key: "appleUserIdentifier")
     var appleUserIdentifier: String?
     
+    
+    @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
+    var updatedAt: Date?
+    
     @Timestamp(key: "createdAt", on: .create, format: .iso8601)
     var createdAt: Date?
     
@@ -53,6 +57,7 @@ final class User: Model {
          appleUserIdentifier: String?,
 //         password: String,
 //         locationID: Location.IDValue,
+         updatedAt: Date? = nil,
          createdAt: Date? = nil
     ) {
         self.id = id
@@ -63,6 +68,7 @@ final class User: Model {
         $location.id = location
         self.appleUserIdentifier = appleUserIdentifier
 //        self.$location.id = locationID
+        self.updatedAt = updatedAt
         self.createdAt = createdAt
         
     }
