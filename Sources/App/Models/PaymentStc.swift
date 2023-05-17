@@ -26,17 +26,22 @@ final class PaymentStc: Model, Content {
     @Field(key: "QR")
     var QR: Data
     
-    @Timestamp(key: "created_at", on: .create)
-       var createdAt: Date?
+    @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
+    var updatedAt: Date?
+    
+    @Timestamp(key: "createdAt", on: .create, format: .iso8601)
+    var createdAt: Date?
     
     init() { }
 
-    init(id: UUID? = nil, joined_user_id: User, order: String, price: Double, createdAt: Date?) throws {
+    init(id: UUID? = nil, joined_user_id: User, order: String, price: Double, updatedAt: Date? = nil,
+         createdAt: Date? = nil) throws {
         self.id = id
 //        $created_user_id.id = try user.requireID()
 //        $joined_user_id.id = try friend.requireID()
        
 
+        self.updatedAt = updatedAt
         self.createdAt = createdAt
     }
 }
