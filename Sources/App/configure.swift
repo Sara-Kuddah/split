@@ -27,7 +27,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateOrder())
     try await app.autoMigrate().get()
 
-    app.views.use(.leaf)
+//    app.views.use(.leaf)
 
     
 
