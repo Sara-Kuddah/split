@@ -24,7 +24,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateToken())
     
     app.migrations.add(CreateItem())
-    app.migrations.add(CreateGroup())
+    app.migrations.add(CreateOrder())
     try await app.autoMigrate().get()
 
     app.views.use(.leaf)

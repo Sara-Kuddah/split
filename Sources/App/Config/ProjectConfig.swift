@@ -9,7 +9,7 @@ import Vapor
 
 struct ProjectConfig {
   struct AccessToken {
-    static let expirationTime: TimeInterval = 1 * 24 * 60 * 60 // 30 days - 1 day
+    static let expirationTime: TimeInterval = 120 * 24 * 60 * 60 // 30 days - 1 day
   }
 
   struct SIWA {

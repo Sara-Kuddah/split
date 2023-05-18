@@ -18,13 +18,8 @@ final class PaymentStc: Model, Content {
     var user_id: User
 
     @Field(key: "phone")
-    var phone: Int
+    var phone: String
     
-    @Field(key: "link")
-    var link: URL
-    
-    @Field(key: "QR")
-    var QR: Data
     
     @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
     var updatedAt: Date?
@@ -34,13 +29,14 @@ final class PaymentStc: Model, Content {
     
     init() { }
 
-    init(id: UUID? = nil, joined_user_id: User, order: String, price: Double, updatedAt: Date? = nil,
+    init(id: UUID? = nil, joined_user_id: User.IDValue, phone: String, updatedAt: Date? = nil,
          createdAt: Date? = nil) throws {
         self.id = id
 //        $created_user_id.id = try user.requireID()
 //        $joined_user_id.id = try friend.requireID()
        
-
+        $user_id.id = joined_user_id
+        self.phone = phone
         self.updatedAt = updatedAt
         self.createdAt = createdAt
     }

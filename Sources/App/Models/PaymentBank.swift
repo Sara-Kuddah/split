@@ -17,8 +17,8 @@ final class PaymentBank: Model, Content {
     @Parent(key: "user_id")
     var user_id: User
 
-    @Field(key: "phone")
-    var phone: Int
+    @OptionalField(key: "phone")
+    var phone: String?
     
     @Field(key: "bname")
     var bname: String
@@ -26,8 +26,8 @@ final class PaymentBank: Model, Content {
     @Field(key: "iban")
     var iban: String
     
-    @Field(key: "account")
-    var account: String
+    @OptionalField(key: "account")
+    var account: String?
     
     @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
     var updatedAt: Date?
@@ -37,13 +37,22 @@ final class PaymentBank: Model, Content {
     
     init() { }
 
-    init(id: UUID? = nil, joined_user_id: User, order: String, price: Double, updatedAt: Date? = nil,
+    init(id: UUID? = nil,
+         user_id: User.IDValue,
+         phone: String?,
+         bname: String,
+         iban: String,
+         account: String?,
+         updatedAt: Date? = nil,
          createdAt: Date? = nil) throws {
         self.id = id
 //        $created_user_id.id = try user.requireID()
 //        $joined_user_id.id = try friend.requireID()
-       
-
+        $user_id.id = user_id
+        self.phone = phone
+        self.bname = bname
+        self.iban = iban
+        self.account = account
         self.updatedAt = updatedAt
         self.createdAt = createdAt
     }
