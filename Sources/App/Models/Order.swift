@@ -13,13 +13,6 @@ final class Order: Model, Content {
 
     @ID(key: .id)
     var id: UUID?
-
-
-    @Parent(key: "created_user_id")
-    var created_user_id: User
-    
-    @Parent(key: "joined_user_id")
-    var joined_user_id: User
     
     @Parent(key: "location_id")
     var location_id: Location
@@ -36,7 +29,13 @@ final class Order: Model, Content {
     @Field(key: "checkpoint")
     var checkpoint: String
     
-    //timer
+    @OptionalField(key: "notes")
+    var notes: String?
+    
+    //items children
+    
+    @Children(for: \.$order)
+    var items: [Item]
     
     @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
     var updatedAt: Date?
@@ -47,15 +46,20 @@ final class Order: Model, Content {
     
     init() { }
 
-    init(id: UUID? = nil, created_user_id: User, joined_user_id: User, merchant_name: String, app_name: String, delivery_fee: Double, checkpoint: String, updatedAt: Date? = nil,
+    init(id: UUID? = nil,
+         merchant_name: String,
+         app_name: String,
+         delivery_fee: Double,
+         checkpoint: String,
+         notes: String?,
+         updatedAt: Date? = nil,
          createdAt: Date? = nil) throws {
         self.id = id
-        $created_user_id.id = try created_user_id.requireID()
-        $joined_user_id.id = try joined_user_id.requireID()
         self.merchant_name = merchant_name
         self.app_name = app_name
         self.delivery_fee = delivery_fee
         self.checkpoint = checkpoint
+        self.notes = notes
         self.updatedAt = updatedAt
         self.createdAt = createdAt
     }

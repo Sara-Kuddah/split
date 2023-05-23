@@ -56,21 +56,3 @@ extension Token: ModelTokenAuthenticatable {
 }
 
 
-//extension Token {
-//    static func generate(for user: User) throws -> Token {
-//        let random = [UInt8].random(count: 16).base64
-//        return try Token(value: random, userID: user.requireID())
-//    }
-//}
-//
-//extension Token: ModelTokenAuthenticatable {
-//
-//    typealias User = App.User
-//
-//    static let valueKey = \Token.$value
-//    static let userKey = \Token.$user
-//
-//    var isValid: Bool {
-//        true
-//    }
-//}

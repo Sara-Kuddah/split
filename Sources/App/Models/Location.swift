@@ -34,11 +34,13 @@ final class Location: Model {
 
     init() { }
 
-    init(id: UUID? = nil,discription: String,
+    init(id: UUID? = nil,
+         discription: String,
          long: Double,
          lat: Double,
          updatedAt: Date? = nil,
          createdAt: Date? = nil) {
+        
         self.id = id
         self.discription = discription
         self.lat = lat

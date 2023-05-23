@@ -23,15 +23,14 @@ final class User: Model {
     
     @Field(key: "email")
     var email: String
-    // here ?????????????*****
-//    @Field(key: "phone")
-//    var phone: Int?
+
     @OptionalField(key: "phone")
     var phone: String?
-//    @Parent(key: "location_id")
-//    var location: Location
+
     @OptionalParent(key: "location_id")
     var location: Location?
+    
+    // payments!! children
     
     @Field(key: "appleUserIdentifier")
     var appleUserIdentifier: String?
@@ -144,24 +143,3 @@ extension User {
 
 
 
-//extension User: Content { }
-//
-//
-//extension User {
-//    func convertToPublic() -> User.Public {
-//        User.Public(id: id, email: email, name: name)
-//    }
-//}
-//
-//extension User: ModelAuthenticatable {
-//    static var email: KeyPath<User, Field<String>> {
-//        <#code#>
-//    }
-//
-//    static let usernameKey = \User.$email
-//    static let passwordHashKey = \User.$password
-//
-//    func verify(password: String) throws -> Bool {
-//        try Bcrypt.verify(password, created: self.password)
-//    }
-//}

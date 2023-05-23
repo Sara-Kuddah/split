@@ -14,7 +14,16 @@ struct UserAPIController {
     let user = try req.auth.require(User.self)
     return try .init(user: user)
   }
+    
+    // post user phone number
+    
+    // get all info including phone
+    
 }
+
+
+
+
 
 // MARK: - RouteCollection
 extension UserAPIController: RouteCollection {
