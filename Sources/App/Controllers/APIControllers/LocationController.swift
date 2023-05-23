@@ -9,17 +9,17 @@ import Fluent
 import Vapor
 
 
-struct LocationController: RouteCollection {
-    func boot(routes: Vapor.RoutesBuilder) throws {
-        <#code#>
-    }
-    
-    // post location
-    // name, long, lat
-    
-    // get location
-    
-    // put location
-    
-    // patch
-}
+//struct LocationController: RouteCollection {
+//    func boot(routes: Vapor.RoutesBuilder) throws {
+//        <#code#>
+//    }
+//    
+//    // post location
+//    // name, long, lat
+//    
+//    // get location
+//    
+//    // put location
+//    
+//    // patch
+//}

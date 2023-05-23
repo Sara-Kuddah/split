@@ -30,7 +30,10 @@ final class User: Model {
     @OptionalParent(key: "location_id")
     var location: Location?
     
-    // payments!! children
+    // payments!! children orders
+    
+    @Children(for: \.$user)
+    var orders: [User_Order]
     
     @Field(key: "appleUserIdentifier")
     var appleUserIdentifier: String?
