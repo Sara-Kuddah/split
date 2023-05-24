@@ -32,7 +32,7 @@ final class Order: Model, Content {
     @OptionalField(key: "notes")
     var notes: String?
     
-    //items children **** add active and status
+    //items children **** add active and status location??
     
     @OptionalField(key: "active")
     var active: Bool?
