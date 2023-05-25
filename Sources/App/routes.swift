@@ -10,4 +10,14 @@ func routes(_ app: Application) throws {
 
   let unprotectedWeb = app.grouped("web")
   try unprotectedWeb.grouped("auth", "siwa").register(collection: SIWAViewController())
+  // location
+    try app.register(collection: LocationController())
+  // stc
+    try app.register(collection: STCController())
+//bank
+    try app.register(collection: BankController())
+    //order
+    try app.register(collection: OrderController())
+    //item
+    try app.register(collection: ItemController())
 }
