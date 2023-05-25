@@ -16,8 +16,8 @@ struct OrderController: RouteCollection {
         routes.get("myactiveorder", use: getMy)
         routes.post("create", use: createOrder)
         routes.post("join", use: joinGroup)
-        routes.put("changestatus", use: changeStatus)
-        routes.put("falseactive", use: setActiveToFalse)
+        routes.patch("changestatus", use: changeStatus)
+        routes.patch("falseactive", use: setActiveToFalse)
     }
     
     
@@ -52,18 +52,23 @@ struct OrderController: RouteCollection {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
 //        let orderStatus = try await Order.query(on: req.db).filter(\Order.$active == true).all(\.$active)
-        return try await User_Order.query(on: req.db)
-        // -- to get order stuff
-            .with(\.$order)
-            .join(Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
-        // -- where user_id == signed in, order status not arrived
-            .filter(Order.self, \.$status != "arrived")
-            .filter(Order.self, \.$active == true)
-            .filter(\.$user.$id == userID)
-        // -- sort by date
-            .sort(Order.self, \.$createdAt)
-        // guard
-            .all().last!
+        
+        guard let order = try await User_Order.query(on: req.db)
+                // -- to get order stuff
+                    .with(\.$order)
+                    .join(Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
+                // -- where user_id == signed in, order status not arrived
+                    .filter(Order.self, \.$status != "arrived")
+                    .filter(Order.self, \.$active == true)
+                    .filter(\.$user.$id == userID)
+                // -- sort by date
+                    .sort(Order.self, \.$createdAt)
+                // guard
+                    .all().last
+        else {
+            throw Abort(.notFound)
+        }
+        return order
     }
     
     

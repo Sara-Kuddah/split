@@ -24,14 +24,14 @@ struct LocationController: RouteCollection {
         // save on database
         try await location.save(on: req.db)
         let updetedUserLocation : User = try await UserAPIController().updateUserToAddLocationID(req: req)
-        print("updetedUserLocation" + updetedUserLocation)
+//        print("updetedUserLocation" + updetedUserLocation)
         return location
     }
     
     // get location
     //  locations/{id}
     func getLocation(req: Request) async throws -> Location {
-        guard let location = try await User.Field(req.parameters.get("id"), on: req.db) else{
+        guard let location = try await User.field(req.parameters.get("id"), on: req.db) else{
             throw Abort(.notFound, reson: "location not found")
         }
         return location
