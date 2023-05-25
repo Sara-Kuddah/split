@@ -9,7 +9,7 @@ import Fluent
 import JWT
 import Vapor
 
-final class User: Model {
+final class User:  Model, Content {
     static let schema = "users"
     
     @ID(key: .id)

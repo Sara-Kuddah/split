@@ -161,7 +161,8 @@ struct createOrderData: Content {
     let app_name: String
     let delivery_fee: Double
     let checkpoint: String
-    let status: String
-    let active: Bool
-    let note: String
+    let notes: String?
+    let active: Bool?
+    let status: String?
+    
 }

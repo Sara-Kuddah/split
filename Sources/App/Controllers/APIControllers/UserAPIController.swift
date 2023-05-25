@@ -25,7 +25,7 @@ struct UserAPIController {
            return user
        } else {
            print( "Error line 26 in UserAPIController can not add phone number to user")
-           throw Abort(.notFound, reson: "user not found can not add phone number to user")
+           throw Abort(.notFound, reason: "user not found can not add phone number to user")
        }
     }
     // updateUserToAddLOcationID
@@ -33,26 +33,32 @@ struct UserAPIController {
     func updateUserToAddLocationID(req: Request) async throws -> User {
         let location = try req.content.decode(Location.self)
        if let user = try await User.find(req.parameters.get("id"), on: req.db){
-           user.location = location.id
+           user.location?.id = location.id
            try await user.update(on: req.db)
            print("location is updated in user db")
            return user
        } else {
            print( "Error line 26 in UserAPIController can not add phone number to user")
-           throw Abort(.notFound, reson: "user not found can not add phone number to user")
+           throw Abort(.notFound, reason: "user not found can not add phone number to user")
        }
     }
     // get all info including phone
     //  users/{id}
     func getUser(req: Request) async throws -> User{
-        guard let user = try await User.Field(req.parameters.get("id"), on: req.db) else{
-            throw Abort(.notFound, reson: "user not found")
+        let user = try req.auth.require(User.self)
+        guard let usera = try await User.find(req.parameters.get("id"), on: req.db) else{
+            throw Abort(.notFound, reason: "user not found")
         }
         return user
     }
     
     // we need get users based on location around
-    
+    func getUsersAround(req: Request) async throws -> [User] {
+        guard let user = try await User.find(req.parameters.get("id"), on: req.db) else{
+            throw Abort(.notFound, reason: "user not found")
+        }
+        return [user]
+    }
 }
 
 
@@ -61,14 +67,14 @@ struct UserAPIController {
 
 // MARK: - RouteCollection
 extension UserAPIController: RouteCollection {
-  func boot(routes: RoutesBuilder) throws {
+    func boot(routes: Vapor.RoutesBuilder) throws {
   //  func boot(routes: Vapor.RoutesBuilder) throws {
       // api/users/me
       routes.get("me", use: getMeHandler)
-      routes.patch(":id", use: updateUserToAddPhoneNumber)
+      routes.patch(":id" ,use: updateUserToAddPhoneNumber)
       routes.get(":id", use: getUser)
-      //updateUserToAddLocationID  ?? we call it from location controler
-      //no need
+      //updateUserToAddLocationID  ?? we call itInstance method 'patch(_:use:)' requires that 'User' conform to 'AsyncResponseEncodable' from location controler
+      //no needInstance method 'get(_:use:)' requires that 'User' conform to 'AsyncResponseEncodable'
 //        let users = routes.grouped("users")
 //        users.on(.GET, "me" , use: getMeHandler)
 //        users.on(.PATCH, ":id" , use: updateUserToAddPhoneNumber)
