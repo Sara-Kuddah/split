@@ -10,12 +10,11 @@ import Vapor
 
 
 struct LocationController: RouteCollection {
-//    func boot(routes: Vapor.RoutesBuilder) throws {
-//        let locations = routes.grouped("location")
-//        locations.on(.GET,  ":id" , use: getLocation)
+
     func boot(routes: RoutesBuilder) throws {
-        routes.get(":id", use: getLocation)
-       
+        routes.post("user", ":id" ,"location" , use: createLocation)
+        routes.get("location", ":id", use: getLocation)
+        routes.patch("location", ":id", use: updateLocation)
     }
     
     // post location
@@ -24,6 +23,8 @@ struct LocationController: RouteCollection {
         let location = try req.content.decode(Location.self)
         // save on database
         try await location.save(on: req.db)
+        let updetedUserLocation : User = try await UserAPIController().updateUserToAddLocationID(req: req)
+        print("updetedUserLocation" + updetedUserLocation)
         return location
     }
     
