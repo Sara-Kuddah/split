@@ -33,7 +33,7 @@ final class User_Order: Model, Content {
          userID: User.IDValue,
          orderID: Order.IDValue,
          type: String,
-         joinedAt: Date?) {
+         joinedAt: Date? = nil) {
         self.id = id
         self.$user.id = userID
         self.$order.id = orderID

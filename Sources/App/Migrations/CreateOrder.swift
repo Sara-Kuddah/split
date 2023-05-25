@@ -17,6 +17,8 @@ struct CreateOrder: AsyncMigration {
             .field("delivery_fee", .string, .required)
             .field("checkpoint", .string, .required)
             .field("notes", .string)
+            .field("active", .bool, .sql(.default(true)))
+            .field("status", .string)
             .field("updatedAt", .string)
             .field("createdAt", .string)
             .create()

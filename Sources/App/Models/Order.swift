@@ -32,7 +32,13 @@ final class Order: Model, Content {
     @OptionalField(key: "notes")
     var notes: String?
     
-    //items children
+    //items children **** add active and status location??
+    
+    @OptionalField(key: "active")
+    var active: Bool?
+    
+    @OptionalField(key: "status")
+    var status: String?
     
     @Children(for: \.$order)
     var items: [Item]
@@ -52,6 +58,8 @@ final class Order: Model, Content {
          delivery_fee: Double,
          checkpoint: String,
          notes: String?,
+         active: Bool?,
+         status: String?,
          updatedAt: Date? = nil,
          createdAt: Date? = nil) throws {
         self.id = id
@@ -60,6 +68,8 @@ final class Order: Model, Content {
         self.delivery_fee = delivery_fee
         self.checkpoint = checkpoint
         self.notes = notes
+        self.active = active
+        self.status = status
         self.updatedAt = updatedAt
         self.createdAt = createdAt
     }

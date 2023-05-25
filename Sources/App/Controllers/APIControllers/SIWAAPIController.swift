@@ -28,7 +28,7 @@ struct SIWAAPIController {
         .flatMap { user in
           if user == nil {
             return SIWAAPIController.signUp(
-              appleIdentityToken: appleIdentityToken,
+              appleIdentityToken: appleIdentityToken,// if fn ln == nil restart or somth
               firstName: userBody.firstName,
               lastName: userBody.lastName,
               req: req

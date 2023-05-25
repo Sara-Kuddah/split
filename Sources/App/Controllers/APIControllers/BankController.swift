@@ -8,15 +8,15 @@
 import Fluent
 import Vapor
 
-struct BankController: RouteCollection {
-    func boot(routes: Vapor.RoutesBuilder) throws {
-        <#code#>
-    }
-    
-    // post iban bank name
-    
-    // post account phone no
-    
-    // get bank info
-    
-}
+//struct BankController: RouteCollection {
+//    func boot(routes: Vapor.RoutesBuilder) throws {
+//        <#code#>
+//    }
+//    
+//    // post iban bank name
+//    
+//    // post account phone no
+//    
+//    // get bank info
+//    
+//}
