@@ -11,50 +11,60 @@ import Vapor
 
 struct LocationController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        routes.post("user", ":id" ,"location" , use: createLocation)
+        routes.post("create", use: createLocation)
         routes.get("location", ":id", use: getLocation)
-        routes.patch("location", ":id", use: updateLocation)
+//        routes.patch("location", ":id", use: updateLocation)
     }
     
     // post location
     // name, discription, long, lat
-    func createLocation(req: Request) async throws -> Location {
-        let location = try req.content.decode(Location.self)
-        // save on database
+    func createLocation(req: Request) async throws -> HTTPStatus {
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
+        let data = try req.content.decode(createLocationData.self)
+
+        let location = Location(userID: userID.self,
+                                discription: data.description,
+                                long: data.long,
+                                lat: data.lat)
+
         try await location.save(on: req.db)
         
-        if let user = try await User.find(req.parameters.get("id"), on: req.db){
-            print(user)
-            print("user.location?.id" , user.location?.id ?? "user.location?.id" )
-            print("location.id" , location.id ?? "user.location?.id" )
-            location.id = user.location?.id
-            try await user.update(on: req.db)
-            //        let updetedUserLocation : User = try await UserAPIController().updateUserToAddLocationID(req: req)
-            //        print( updetedUserLocation)
-        }
-        return location
+        return .noContent
     }
     
     // get location
     //  locations/{id}
     func getLocation(req: Request) async throws -> Location {
-        guard let location = try await Location.find(req.parameters.get("id"), on: req.db) else{
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
+        guard let location = try await Location.query(on: req.db)
+            .filter(\.$user.$id == userID)
+            .all().last
+        else{
             throw Abort(.notFound, reason: "location not found")
         }
         return location
     }
-    // patch location
+    // put location
     func updateLocation(req: Request) async throws -> Location {
-        let input = try req.content.decode(Location.self)
-        if let location = try await Location.find(req.parameters.get("id"), on: req.db) {
-            location.discription = input.discription
-            location.long = input.long
-            location.lat = input.lat
-            try await location.update(on: req.db)
-            return location
-        } else {
-            return try await createLocation(req: req)
+        try req.auth.require(User.self)
+        let location = try req.content.decode(Location.self)
+        guard let locationFromDB = try await Location.find(location.id, on: req.db) else {
+            throw Abort(.notFound)
         }
+        locationFromDB.discription = location.discription
+        locationFromDB.long = location.long
+        locationFromDB.lat = location.lat
+        try await locationFromDB.update(on: req.db)
+        return location
     }
     
+}
+
+
+struct createLocationData: Content {
+    let description: String
+    let long: Double
+    let lat: Double
 }

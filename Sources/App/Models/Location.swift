@@ -13,7 +13,10 @@ final class Location: Model , Content {
     
     @ID(key: .id)
     var id: UUID?
-
+    
+    @Parent(key: "userID")
+    var user: User
+    
     @Field(key: "discription")
     var discription: String
     
@@ -29,12 +32,12 @@ final class Location: Model , Content {
     @Timestamp(key: "createdAt", on: .create, format: .iso8601)
     var createdAt: Date?
 
-    @Children(for: \.$location)
-    var users: [User]
+    
 
     init() { }
 
     init(id: UUID? = nil,
+         userID: User.IDValue,
          discription: String,
          long: Double,
          lat: Double,
@@ -42,6 +45,7 @@ final class Location: Model , Content {
          createdAt: Date? = nil) {
         
         self.id = id
+        self.$user.id = userID
         self.discription = discription
         self.lat = lat
         self.long = long

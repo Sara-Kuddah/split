@@ -14,8 +14,8 @@ final class Order: Model, Content {
     @ID(key: .id)
     var id: UUID?
     
-    @Parent(key: "location_id")
-    var location_id: Location
+    @Parent(key: "locationID")
+    var location: Location
 
     @Field(key: "merchant_name")
     var merchant_name: String
@@ -53,6 +53,7 @@ final class Order: Model, Content {
     init() { }
 
     init(id: UUID? = nil,
+         locationID: Location.IDValue,
          merchant_name: String,
          app_name: String,
          delivery_fee: Double,
@@ -63,6 +64,7 @@ final class Order: Model, Content {
          updatedAt: Date? = nil,
          createdAt: Date? = nil) throws {
         self.id = id
+        self.$location.id = locationID
         self.merchant_name = merchant_name
         self.app_name = app_name
         self.delivery_fee = delivery_fee

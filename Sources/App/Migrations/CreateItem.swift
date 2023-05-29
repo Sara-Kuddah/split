@@ -11,9 +11,10 @@ struct CreateItem: AsyncMigration {
     func prepare(on database: Database) async throws {
         try await database.schema(Item.schema)
             .id()
-            .field("joined_user_id", .uuid, .required, .references("users", "id"))
-            .field("order_name", .string, .required)
-            .field("price", .string, .required)
+            .field("joined_userID", .uuid, .required, .references("users", "id"))
+            .field("orderID", .uuid, .required, .references("orders", "id"))
+            .field("item_name", .string, .required)
+            .field("price", .double, .required)
             .field("updatedAt", .string)
             .field("createdAt", .string)
             .create()

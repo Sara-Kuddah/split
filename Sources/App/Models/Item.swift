@@ -14,11 +14,11 @@ final class Item: Model, Content {
     @ID(key: .id)
     var id: UUID?
     
-    @Parent(key: "joined_user_id")
-    var joined_user_id: User
+    @Parent(key: "joined_userID")
+    var joined_user: User
 
     // add order id
-    @Parent(key: "Order_id")
+    @Parent(key: "OrderID")
     var order: Order
     
     @Field(key: "item_name")
@@ -35,13 +35,16 @@ final class Item: Model, Content {
     init() { }
 
     init(id: UUID? = nil,
-         joined_user_id: User.IDValue,
+         joined_userID: User.IDValue,
+         orderID: Order.IDValue,
          item_name: String,
          price: Double,
          updatedAt: Date? = nil,
          createdAt: Date? = nil) throws {
         
         self.id = id
+        self.$joined_user.id = joined_userID
+        self.$order.id = orderID
         self.item_name = item_name
         self.price = price
         self.updatedAt = updatedAt

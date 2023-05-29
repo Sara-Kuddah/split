@@ -15,7 +15,6 @@ struct CreateUser_Order: AsyncMigration {
             .field("orderID", .uuid, .required, .references("orders", "id"))
             .field("type", .string, .required)
             .field("joinedAt", .string)
-            
             .create()
     }
 

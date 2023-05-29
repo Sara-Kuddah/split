@@ -11,10 +11,10 @@ struct CreateOrder: AsyncMigration {
     func prepare(on database: Database) async throws {
         try await database.schema(Order.schema)
             .id()
-            .field("location_id", .uuid, .required, .references("locations", "id"))
+            .field("locationID", .uuid, .required, .references("locations", "id"))
             .field("merchant_name", .string, .required)
             .field("app_name", .string, .required)
-            .field("delivery_fee", .string, .required)
+            .field("delivery_fee", .double, .required)
             .field("checkpoint", .string, .required)
             .field("notes", .string)
             .field("active", .bool, .sql(.default(true)))

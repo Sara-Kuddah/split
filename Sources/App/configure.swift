@@ -14,16 +14,16 @@ public func configure(_ app: Application) async throws {
     app.databases.use(.postgres(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
         port: Environment.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? PostgresConfiguration.ianaPortNumber,
-        username: Environment.get("DATABASE_USERNAME") ?? "sarabinkuddah",
+        username: Environment.get("DATABASE_USERNAME") ?? "alaaalabdullah",
         password: Environment.get("DATABASE_PASSWORD") ?? "",
-        database: Environment.get("DATABASE_NAME") ?? "spliting"
+        database: Environment.get("DATABASE_NAME") ?? "split3"
     ), as: .psql)
     app.migrations.add(CreateLocation())
     app.migrations.add(CreateUser())
     app.migrations.add(CreateToken())
-    
     app.migrations.add(CreateItem())
     app.migrations.add(CreateOrder())
+    app.migrations.add(CreateUser_Order())
     try await app.autoMigrate().get()
 
 //    app.views.use(.leaf)

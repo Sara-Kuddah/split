@@ -15,7 +15,7 @@ struct OrderController: RouteCollection {
         routes.get("lastrandomorders", use: getActiveOrder)
         routes.get("myactiveorder", use: getMy)
         routes.post("create", use: createOrder)
-        routes.post("join", use: joinGroup)
+        routes.post("join",":orderID", use: joinGroup)
         routes.patch("changestatus", use: changeStatus)
         routes.patch("falseactive", use: setActiveToFalse)
     }
@@ -30,6 +30,7 @@ struct OrderController: RouteCollection {
             .with(\.$order)
             .join(Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
             .filter(\.$user.$id == userID)
+            .sort(Order.self, \.$createdAt)
             .all()
     }
     
@@ -37,13 +38,12 @@ struct OrderController: RouteCollection {
     // -- all active orders 10 \ for unsigned users --
     func getActiveOrder(req: Request) async throws -> [Order] {
         return try await Order.query(on: req.db)
-//            .chunk(max: 10 ){ _ in }
             .join(User_Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
             .filter(\Order.$active == true)
             .sort(Order.self, \.$createdAt)
             .range(..<10)
             .all()
-//            .range(..<10)
+
     
 }
     
@@ -51,8 +51,6 @@ struct OrderController: RouteCollection {
     func getMy(req: Request) async throws -> User_Order {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
-//        let orderStatus = try await Order.query(on: req.db).filter(\Order.$active == true).all(\.$active)
-        
         guard let order = try await User_Order.query(on: req.db)
                 // -- to get order stuff
                     .with(\.$order)
@@ -63,7 +61,6 @@ struct OrderController: RouteCollection {
                     .filter(\.$user.$id == userID)
                 // -- sort by date
                     .sort(Order.self, \.$createdAt)
-                // guard
                     .all().last
         else {
             throw Abort(.notFound)
@@ -75,26 +72,28 @@ struct OrderController: RouteCollection {
     
     // -- all active orders around me -- \ location needed
     func getActiveAroundMe(req: Request) async throws -> [Order] {
-        let user = try req.auth.require(User.self)
-        let userID = try user.requireID()
-        
+        try req.auth.require(User.self)
         return try await Order.query(on: req.db)
-            // get location, then??
-        
-            
+            .join(User_Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
+            .filter(\Order.$active == true)
+            .sort(Order.self, \.$createdAt)
             .all()
     }
     
-    // post order / users_orders
-    // merchant_name, app_name, delivery_fee
-    // checkpoint, active=true, status
-    // notes, location
+    // if user already has an active order????????
     // user_order: order_id, user_id, user_type \ Location??
-    func createOrder(req: Request) async throws -> Order {
+    func createOrder(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
+        guard let location = try await Location.query(on: req.db)
+            .filter(\.$user.$id == userID)
+            .all(\.$id).last
+        else{
+            throw Abort(.notFound, reason: "location not found")
+        }
         let data = try req.content.decode(createOrderData.self)
-        let order = try Order(merchant_name: data.merchant_name,
+        let order = try Order(locationID: location,
+                              merchant_name: data.merchant_name,
                               app_name: data.app_name,
                               delivery_fee: data.delivery_fee,
                               checkpoint: data.checkpoint,
@@ -106,7 +105,7 @@ struct OrderController: RouteCollection {
                                         orderID: order.requireID(),
                                         type: "created")
         try await user_order.save(on: req.db)
-        return order
+        return .noContent
     }
     
     // post users_orders
@@ -115,7 +114,12 @@ struct OrderController: RouteCollection {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
         let orderID = try req.parameters.require("orderID", as: UUID.self)
-        
+        let itemData = try req.content.decode(createItemData.self)
+        let item = try Item(joined_userID: userID.self,
+                            orderID: orderID.self,
+                            item_name: itemData.item_name,
+                             price: itemData.price)
+        try await item.save(on: req.db)
         guard let order = try await Order.find(orderID, on: req.db)
         else {
             throw Abort(.notFound, reason: "Order not found")
@@ -128,7 +132,7 @@ struct OrderController: RouteCollection {
         
     }
     
-    // put status
+    // patch status
     func changeStatus(req: Request) async throws -> HTTPStatus {
         try req.auth.require(User.self)
         let order = try req.content.decode(Order.self)
@@ -140,11 +144,10 @@ struct OrderController: RouteCollection {
         storedOrder.status = order.status
         try await storedOrder.update(on: req.db)
         
-        
         return .noContent
     }
     
-    // put active
+    // patch active
     func setActiveToFalse(req: Request) async throws -> HTTPStatus {
         try req.auth.require(User.self)
         let order = try req.content.decode(Order.self)
@@ -156,12 +159,12 @@ struct OrderController: RouteCollection {
         storedOrder.active = false
         try await storedOrder.update(on: req.db)
         
-        
         return .noContent
     }
 }
 
 struct createOrderData: Content {
+//    let location: Location.IDValue
     let merchant_name: String
     let app_name: String
     let delivery_fee: Double
@@ -170,4 +173,11 @@ struct createOrderData: Content {
     let active: Bool?
     let status: String?
     
+}
+
+struct createItemData: Content {
+//    let user: User.IDValue
+//    let order: Order.IDValue
+    let item_name: String
+    let price: Double
 }

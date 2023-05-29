@@ -11,6 +11,7 @@ struct CreateLocation: AsyncMigration {
     func prepare(on database: Database) async throws {
         try await database.schema(Location.schema)
             .id()
+            .field("userID", .uuid, .required, .references("users", "id"))
             .field("discription", .string, .required)
             .field("long", .double, .required)
             .field("lat", .double, .required)
