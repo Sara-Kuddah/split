@@ -11,7 +11,8 @@ func routes(_ app: Application) throws {
   let unprotectedWeb = app.grouped("web")
   try unprotectedWeb.grouped("auth", "siwa").register(collection: SIWAViewController())
   // location
-    try app.register(collection: LocationController())
+//    try app.register(collection: LocationController())
+    try tokenProtectedAPI.grouped("locations").register(collection: LocationController())
   // stc
 //    try app.register(collection: STCController())
 //bank

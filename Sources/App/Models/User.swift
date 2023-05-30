@@ -27,8 +27,6 @@ final class User:  Model, Content {
     @OptionalField(key: "phone")
     var phone: String?
 
-    @OptionalParent(key: "location_id")
-    var location: Location?
     
     // payments!! children orders
     
@@ -55,7 +53,7 @@ final class User:  Model, Content {
          firstName: String? = nil,
          lastName: String? = nil,
          phone: String? = nil,
-         location: Location.IDValue? = nil,
+//         location: Location.IDValue? = nil,
          appleUserIdentifier: String?,
 //         password: String,
 //         locationID: Location.IDValue,
@@ -67,7 +65,7 @@ final class User:  Model, Content {
         self.firstName = firstName
         self.lastName = lastName
         self.phone = phone
-        $location.id = location
+//        $location.id = location
         self.appleUserIdentifier = appleUserIdentifier
 //        self.$location.id = locationID
         self.updatedAt = updatedAt

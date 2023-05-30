@@ -12,7 +12,7 @@ import Vapor
 struct LocationController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         routes.post("create", use: createLocation)
-        routes.get("location", ":id", use: getLocation)
+        routes.get("location", use: getLocation)
 //        routes.patch("location", ":id", use: updateLocation)
     }
     
