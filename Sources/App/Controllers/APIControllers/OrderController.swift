@@ -75,6 +75,8 @@ struct OrderController: RouteCollection {
         try req.auth.require(User.self)
         return try await Order.query(on: req.db)
             .join(User_Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
+            .join(Location.self, on: \Location.$id == \Order.$location.$id)
+        //-- here do location math --
             .filter(\Order.$active == true)
             .sort(Order.self, \.$createdAt)
             .all()
