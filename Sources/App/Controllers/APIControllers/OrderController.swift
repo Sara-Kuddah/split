@@ -14,6 +14,7 @@ struct OrderController: RouteCollection {
         routes.get("myorders", use: getMeHandler)
         routes.get("lastrandomorders", use: getActiveOrder)
         routes.get("myactiveorder", use: getMy)
+        routes.get("getactiveordersaroundme", use: getActiveOrdersAroundMe)
         routes.post("create", use: createOrder)
         routes.post("join",":orderID", use: joinGroup)
         routes.patch("changestatus", use: changeStatus)
@@ -71,11 +72,22 @@ struct OrderController: RouteCollection {
     
     
     // -- all active orders around me -- \ location needed
-    func getActiveAroundMe(req: Request) async throws -> [Order] {
-        try req.auth.require(User.self)
+    func getActiveOrdersAroundMe(req: Request) async throws -> [Order] {
+//        let user = try req.auth.require(User.self)
+//        let userID = try user.requireID()
+        let userCurrentLocation = try await LocationController().getLocation(req: req)
+        let userCurrentLocation_Down = userCurrentLocation.lat - 0.00040000000000
+        let userCurrentLocation_Up = userCurrentLocation.lat + 0.00040000000000
+        let userCurrentLocation_Right = userCurrentLocation.long + 0.00050000000000
+        let userCurrentLocation_Left = userCurrentLocation.long - 0.00050000000000
+            
         return try await Order.query(on: req.db)
-            .join(User_Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
             .join(Location.self, on: \Location.$id == \Order.$location.$id)
+        //-- here do location math --
+            .filter(Location.self , \.$lat >= userCurrentLocation_Down)
+            .filter(Location.self, \.$lat <= userCurrentLocation_Up)
+            .filter(Location.self, \.$long <= userCurrentLocation_Right)
+            .filter(Location.self, \.$long >= userCurrentLocation_Left)
         //-- here do location math --
             .filter(\Order.$active == true)
             .sort(Order.self, \.$createdAt)
