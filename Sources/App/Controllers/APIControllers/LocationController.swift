@@ -46,6 +46,8 @@ struct LocationController: RouteCollection {
         }
         return location
     }
+    
+    
     // put location
     func updateLocation(req: Request) async throws -> Location {
         try req.auth.require(User.self)

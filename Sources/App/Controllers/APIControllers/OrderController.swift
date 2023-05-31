@@ -15,7 +15,7 @@ struct OrderController: RouteCollection {
         routes.get("lastrandomorders", use: getActiveOrder)
         routes.get("myactiveorder", use: getMy)
         routes.post("create", use: createOrder)
-        routes.post("join",":orderID", use: joinGroup)
+        routes.post(":orderID", use: joinGroup)
         routes.patch("changestatus", use: changeStatus)
         routes.patch("falseactive", use: setActiveToFalse)
     }
@@ -73,6 +73,7 @@ struct OrderController: RouteCollection {
     // -- all active orders around me -- \ location needed
     func getActiveAroundMe(req: Request) async throws -> [Order] {
         try req.auth.require(User.self)
+      
         return try await Order.query(on: req.db)
             .join(User_Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
             .join(Location.self, on: \Location.$id == \Order.$location.$id)
@@ -99,7 +100,7 @@ struct OrderController: RouteCollection {
                               app_name: data.app_name,
                               delivery_fee: data.delivery_fee,
                               checkpoint: data.checkpoint,
-                              notes: data.checkpoint,
+                              notes: data.notes,
                               active: data.active,
                               status: data.status)
         try await order.save(on: req.db)
@@ -112,25 +113,30 @@ struct OrderController: RouteCollection {
     
     // post users_orders
     //order_id, user_id, user_type="joined"
-    func joinGroup(req: Request) async throws -> Order {
+    func joinGroup(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
         let orderID = try req.parameters.require("orderID", as: UUID.self)
         let itemData = try req.content.decode(createItemData.self)
-        let item = try Item(joined_userID: userID.self,
-                            orderID: orderID.self,
-                            item_name: itemData.item_name,
-                             price: itemData.price)
-        try await item.save(on: req.db)
         guard let order = try await Order.find(orderID, on: req.db)
-        else {
-            throw Abort(.notFound, reason: "Order not found")
-        }
+              else {
+                  throw Abort(.notFound, reason: "Order not found")
+              }
+//        let item = try Item(joined_userID: userID.self,
+//                            orderID: try order.requireID(),
+//                            item_name: itemData.item_name,
+//                             price: itemData.price)
+//        print("///////////132/////////")
+//        print(item)
+//        try await item.save(on: req.db)
+//        
+////
+        
         let user_order = User_Order(userID: userID.self,
-                                        orderID: orderID.self,
+                                    orderID: try order.requireID(),
                                         type: "joined")
         try await user_order.save(on: req.db)
-        return order
+        return .noContent
         
     }
     
