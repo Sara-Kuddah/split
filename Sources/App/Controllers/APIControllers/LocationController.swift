@@ -13,7 +13,7 @@ struct LocationController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         routes.post("create", use: createLocation)
         routes.get("location", use: getLocation)
-//        routes.patch("location", ":id", use: updateLocation)
+        routes.patch("location", use: updateLocation)
     }
     
     // post location
@@ -61,7 +61,6 @@ struct LocationController: RouteCollection {
     }
     
 }
-
 
 struct createLocationData: Content {
     let description: String
