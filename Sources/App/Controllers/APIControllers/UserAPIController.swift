@@ -28,6 +28,9 @@ struct UserAPIController {
            throw Abort(.notFound, reason: "user not found can not add phone number to user")
        }
     }
+    
+ 
+    
     // updateUserToAddLOcationID
     //this will call by createLocation in LocationController()
 //    func updateUserToAddLocationID(req: Request) async throws -> User {
@@ -46,7 +49,7 @@ struct UserAPIController {
     //  users/{id}
     func getUser(req: Request) async throws -> User{
         let user = try req.auth.require(User.self)
-        guard let usera = try await User.find(req.parameters.get("id"), on: req.db) else{
+        guard let user = try await User.find(req.parameters.get("id"), on: req.db) else{
             throw Abort(.notFound, reason: "user not found")
         }
         return user

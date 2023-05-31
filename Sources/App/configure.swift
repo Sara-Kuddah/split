@@ -22,6 +22,7 @@ public func configure(_ app: Application) async throws {
     
     app.migrations.add(CreateUser())
     app.migrations.add(CreateLocation())
+    app.migrations.add(CreateSTC())
     app.migrations.add(CreateToken())
     app.migrations.add(CreateOrder())
     app.migrations.add(CreateItem())
