@@ -8,7 +8,7 @@
 import Fluent
 import Vapor
 
-
+// done testing all routes 
 struct STCController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         //api/stcpayments/
@@ -16,7 +16,8 @@ struct STCController: RouteCollection {
         routes.get("stcpayment", use: getSTCPayment)
         routes.patch("stcpayment", use: updateSTCPayment)
     }
-    //post STCPaymen info
+    //post STC pay info
+    //api/stcpayments/create
     func createSTCPayment(req: Request) async throws -> PaymentStc {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
@@ -30,7 +31,8 @@ struct STCController: RouteCollection {
         return newPaymentStc
     }
     
-    //get phone
+    //get STC pay info
+    //api/stcpayments/stcpayment
     func getSTCPayment(req: Request) async throws -> PaymentStc {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
@@ -42,6 +44,8 @@ struct STCController: RouteCollection {
         }
         return newPaymentStc
     }
+    // patch STC pay info
+    //api/stcpayments/stcpayment
     func updateSTCPayment(req: Request) async throws -> PaymentStc {
         let newPaymentStc = try req.content.decode(STCPaymentData.self)
         let PaymentStcFromDB = try await getSTCPayment(req: req)
