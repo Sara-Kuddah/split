@@ -52,12 +52,36 @@ struct UserAPIController {
         return user
     }
     
-    // we need get users based on location around
+    // we need get users around based on location of created order
+    // api/users/:oreder_id/getusersaround
     func getUsersAround(req: Request) async throws -> [User] {
-        guard let user = try await User.find(req.parameters.get("id"), on: req.db) else{
-            throw Abort(.notFound, reason: "user not found")
-        }
-        return [user]
+        print("getUsersAround //////////" )
+        let orderID = try req.parameters.require("id", as: UUID.self)
+        print("orderID //////////"  , orderID)
+        let order = try await Order.find(orderID, on: req.db)
+       
+        print(order!.$location.$id.value)
+        let locationID = order!.$location.$id.value
+        print("befor orderCurrentLocation")
+        let orderCurrentLocation = try await Location.find(locationID, on: req.db)
+        print("orderCurrentLocation" , orderCurrentLocation)
+        let orderCurrentLocation_Down = orderCurrentLocation!.lat - 0.00040000000000
+        let orderCurrentLocation_Up = orderCurrentLocation!.lat + 0.00040000000000
+        let orderCurrentLocation_Right = orderCurrentLocation!.long + 0.00050000000000
+        let orderCurrentLocation_Left = orderCurrentLocation!.long - 0.00050000000000
+        
+        return try await User.query(on: req.db)
+            .join(Location.self , on:  \User.$id == \Location.$user.$id)
+            .filter(Location.self , \.$lat >= orderCurrentLocation_Down)
+            .filter(Location.self, \.$lat <= orderCurrentLocation_Up)
+            .filter(Location.self, \.$long <= orderCurrentLocation_Right)
+            .filter(Location.self, \.$long >= orderCurrentLocation_Left)
+            .all()
+
+//        guard let user = try await User.find(req.parameters.get("id"), on: req.db) else{
+//            throw Abort(.notFound, reason: "user not found")
+//        }
+//        return [user]
     }
 }
 
@@ -73,6 +97,7 @@ extension UserAPIController: RouteCollection {
       routes.get("me", use: getMeHandler)
       routes.patch(":id" ,use: updateUserToAddPhoneNumber)
       routes.get(":id", use: getUser)
+        routes.get(":id","getusersaround", use: getUsersAround)
       //updateUserToAddLocationID  ?? we call itInstance method 'patch(_:use:)' requires that 'User' conform to 'AsyncResponseEncodable' from location controler
       //no needInstance method 'get(_:use:)' requires that 'User' conform to 'AsyncResponseEncodable'
 //        let users = routes.grouped("users")
