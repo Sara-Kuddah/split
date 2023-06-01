@@ -20,7 +20,6 @@ final class PaymentStc: Model, Content {
     @Field(key: "phone")
     var phone: String
     
-    
     @Timestamp(key: "updatedAt", on: .update, format: .iso8601)
     var updatedAt: Date?
     

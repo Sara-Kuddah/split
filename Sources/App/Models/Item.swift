@@ -18,7 +18,7 @@ final class Item: Model, Content {
     var joined_user: User
 
     // add order id
-    @Parent(key: "OrderID")
+    @Parent(key: "orderID")
     var order: Order
     
     @Field(key: "item_name")

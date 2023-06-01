@@ -24,18 +24,44 @@ struct ItemController: RouteCollection {
               else {
                   throw Abort(.notFound, reason: "Order not found")
               }
-        let item = try Item(joined_userID: userID.self,
+        let item = try Item(joined_userID: userID,
                             orderID: try order.requireID(),
                             item_name: itemData.item_name,
                              price: itemData.price)
-        print("///////////132/////////")
-        print(item)
         try await item.save(on: req.db)
         return .noContent
     }
     // get my items in an order
     
+    
+    func getItems(req: Request) async throws -> [Item] {
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
+        let orderID = try req.parameters.require("orderID", as: UUID.self)
+//        guard let order = try await Order.find(orderID, on: req.db)
+//              else {
+//                  throw Abort(.notFound, reason: "Order not found")
+//              }
+        return try await Item.query(on: req.db)
+            .join(Order.self, on: \Order.$id == \Item.$order.$id)
+            .filter(\Item.$order.$id == orderID)
+            .all()
+    }
     // get all order's items
+    func getAllItems(req: Request) async throws -> [Item] {
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
+        let orderID = try req.parameters.require("orderID", as: UUID.self)
+//        guard let order = try await Order.find(orderID, on: req.db)
+//              else {
+//                  throw Abort(.notFound, reason: "Order not found")
+//              }
+        return try await Item.query(on: req.db)
+            .join(Order.self, on: \Order.$id == \Item.$order.$id)
+            .filter(\Item.$order.$id == orderID)
+            .sort(Order.self, )
+            .all()
+    }
     
     // get all my items in general
 }
