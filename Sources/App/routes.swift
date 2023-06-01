@@ -17,7 +17,8 @@ func routes(_ app: Application) throws {
     //stcpayments
     try tokenProtectedAPI.grouped("stcpayments").register(collection: STCController())
 //bank
-//    try app.register(collection: BankController())
+    //bankpayment
+    try tokenProtectedAPI.grouped("bankpayments").register(collection: BankController())
     //order
     try tokenProtectedAPI.grouped("orders").register(collection: OrderController())
     //item

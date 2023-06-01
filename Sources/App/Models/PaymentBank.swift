@@ -48,7 +48,7 @@ final class PaymentBank: Model, Content {
         self.id = id
 //        $created_user_id.id = try user.requireID()
 //        $joined_user_id.id = try friend.requireID()
-        $user_id.id = user_id
+        self.$user_id.id = user_id
         self.phone = phone
         self.bname = bname
         self.iban = iban

@@ -21,7 +21,6 @@ struct STCController: RouteCollection {
     func createSTCPayment(req: Request) async throws -> PaymentStc {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
-        print("userID" , userID)
         let data = try req.content.decode(STCPaymentData.self)
 
         let newPaymentStc = try PaymentStc(joined_user_id: userID, phone: data.phone)
