@@ -14,9 +14,11 @@ func routes(_ app: Application) throws {
 //    try app.register(collection: LocationController())
     try tokenProtectedAPI.grouped("locations").register(collection: LocationController())
   // stc
-//    try app.register(collection: STCController())
+    //stcpayments
+    try tokenProtectedAPI.grouped("stcpayments").register(collection: STCController())
 //bank
-//    try app.register(collection: BankController())
+    //bankpayment
+    try tokenProtectedAPI.grouped("bankpayments").register(collection: BankController())
     //order
     try tokenProtectedAPI.grouped("orders").register(collection: OrderController())
     try tokenProtectedAPI.grouped("items").register(collection: ItemController())

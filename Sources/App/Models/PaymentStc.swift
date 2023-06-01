@@ -34,7 +34,7 @@ final class PaymentStc: Model, Content {
 //        $created_user_id.id = try user.requireID()
 //        $joined_user_id.id = try friend.requireID()
        
-        $user_id.id = joined_user_id
+        self.$user_id.id = joined_user_id
         self.phone = phone
         self.updatedAt = updatedAt
         self.createdAt = createdAt

@@ -17,24 +17,22 @@ struct LocationController: RouteCollection {
     }
     
     // post location
-    // name, discription, long, lat
-    func createLocation(req: Request) async throws -> HTTPStatus {
+    // api/locations/create
+    func createLocation(req: Request) async throws -> Location {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
         let data = try req.content.decode(createLocationData.self)
 
         let location = Location(userID: userID.self,
-                                discription: data.description,
+                                discription: data.discription,
                                 long: data.long,
                                 lat: data.lat)
-
         try await location.save(on: req.db)
-        
-        return .noContent
+        return location
     }
-    
+
     // get location
-    //  locations/{id}
+    //api/locations/location
     func getLocation(req: Request) async throws -> Location {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
@@ -46,26 +44,23 @@ struct LocationController: RouteCollection {
         }
         return location
     }
-    
-    
-    // put location
+    // patch location
+    //api/locations/location
     func updateLocation(req: Request) async throws -> Location {
         try req.auth.require(User.self)
-        let location = try req.content.decode(Location.self)
-        guard let locationFromDB = try await Location.find(location.id, on: req.db) else {
-            throw Abort(.notFound)
-        }
+        let location = try req.content.decode(createLocationData.self)
+        let locationFromDB = try await getLocation(req: req)
         locationFromDB.discription = location.discription
         locationFromDB.long = location.long
         locationFromDB.lat = location.lat
         try await locationFromDB.update(on: req.db)
-        return location
+        return locationFromDB
     }
     
 }
 
 struct createLocationData: Content {
-    let description: String
+    let discription: String
     let long: Double
     let lat: Double
 }
