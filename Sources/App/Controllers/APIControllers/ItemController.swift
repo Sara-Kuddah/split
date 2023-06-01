@@ -59,7 +59,7 @@ struct ItemController: RouteCollection {
         return try await Item.query(on: req.db)
             .join(Order.self, on: \Order.$id == \Item.$order.$id)
             .filter(\Item.$order.$id == orderID)
-            .sort(Order.self, )
+            .sort(Order.self, \.$createdAt)
             .all()
     }
     
