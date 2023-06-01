@@ -16,9 +16,10 @@ struct OrderController: RouteCollection {
         routes.get("myactiveorder", use: getMy)
         routes.get("getactiveordersaroundme", use: getActiveOrdersAroundMe)
         routes.post("create", use: createOrder)
-        routes.post(":orderID", use: joinGroup)
+        routes.post("join",":orderID", use: joinGroup)
         routes.patch("changestatus", use: changeStatus)
         routes.patch("falseactive", use: setActiveToFalse)
+        routes.patch("deliveryFeeUpdate", use: changeDeliveryFee)
     }
     
     
@@ -30,7 +31,9 @@ struct OrderController: RouteCollection {
         return try await User_Order.query(on: req.db)
             .with(\.$order)
             .join(Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
+//            .join(Item.self, on: \User_Order.$order.$id == \Item.$order.$id, method: .inner)
             .filter(\.$user.$id == userID)
+            .filter(\.$type == "created")
             .sort(Order.self, \.$createdAt)
             .all()
     }
@@ -128,20 +131,10 @@ struct OrderController: RouteCollection {
         let user = try req.auth.require(User.self)
         let userID = try user.requireID()
         let orderID = try req.parameters.require("orderID", as: UUID.self)
-        let itemData = try req.content.decode(createItemData.self)
         guard let order = try await Order.find(orderID, on: req.db)
               else {
                   throw Abort(.notFound, reason: "Order not found")
               }
-//        let item = try Item(joined_userID: userID.self,
-//                            orderID: try order.requireID(),
-//                            item_name: itemData.item_name,
-//                             price: itemData.price)
-//        print("///////////132/////////")
-//        print(item)
-//        try await item.save(on: req.db)
-//        
-////
         
         let user_order = User_Order(userID: userID.self,
                                     orderID: try order.requireID(),
@@ -176,6 +169,21 @@ struct OrderController: RouteCollection {
             throw Abort(.notFound)
         }
         storedOrder.active = false
+        try await storedOrder.update(on: req.db)
+        
+        return .noContent
+    }
+    
+    // patch delivery fee
+    func changeDeliveryFee(req: Request) async throws -> HTTPStatus {
+        try req.auth.require(User.self)
+        let order = try req.content.decode(Order.self)
+        
+        guard let storedOrder = try await Order.find(order.id, on: req.db)
+        else {
+            throw Abort(.notFound)
+        }
+        storedOrder.delivery_fee = order.delivery_fee
         try await storedOrder.update(on: req.db)
         
         return .noContent
