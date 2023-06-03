@@ -11,7 +11,7 @@ import Vapor
 
 struct OrderController: RouteCollection {
     func boot(routes: Vapor.RoutesBuilder) throws {
-        routes.get("myorders", use: getMeHandler)
+        routes.get("myorders", use: getMyOrdersHandler)
         routes.get("lastrandomorders", use: getActiveOrder)
         routes.get("myactiveorder", use: getMy)
         routes.get("getactiveordersaroundme", use: getActiveOrdersAroundMe)
@@ -34,6 +34,18 @@ struct OrderController: RouteCollection {
 //            .join(Item.self, on: \User_Order.$order.$id == \Item.$order.$id, method: .inner)
             .filter(\.$user.$id == userID)
             .filter(\.$type == "created")
+            .sort(Order.self, \.$createdAt)
+            .all()
+    }
+    func getMyOrdersHandler(req: Request) async throws -> [Order] {
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
+        return try await Order.query(on: req.db)
+            .with(\.$items)
+            .join(User_Order.self, on: \User_Order.$order.$id == \Order.$id, method: .inner)
+//            .join(Item.self, on: \User_Order.$order.$id == \Item.$order.$id, method: .inner)
+//            .filter(User_Order.self, \.$user.$id == userID)
+//            .filter(User_Order.self, \.$type == "created")
             .sort(Order.self, \.$createdAt)
             .all()
     }
@@ -76,8 +88,8 @@ struct OrderController: RouteCollection {
     
     // -- all active orders around me -- \ location needed
     func getActiveOrdersAroundMe(req: Request) async throws -> [Order] {
-//        let user = try req.auth.require(User.self)
-//        let userID = try user.requireID()
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
         let userCurrentLocation = try await LocationController().getLocation(req: req)
         let userCurrentLocation_Down = userCurrentLocation.lat - 0.00040000000000
         let userCurrentLocation_Up = userCurrentLocation.lat + 0.00040000000000
@@ -91,8 +103,10 @@ struct OrderController: RouteCollection {
             .filter(Location.self, \.$lat <= userCurrentLocation_Up)
             .filter(Location.self, \.$long <= userCurrentLocation_Right)
             .filter(Location.self, \.$long >= userCurrentLocation_Left)
-        //-- here do location math --
+        //--  done location math --
             .filter(\Order.$active == true)
+            .filter(\Order.$status == "waiting")
+            .filter(Location.self, \Location.$user.$id != userID)
             .sort(Order.self, \.$createdAt)
             .all()
     }
