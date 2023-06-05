@@ -104,5 +104,6 @@ struct SIWAAPIController {
 extension SIWAAPIController: RouteCollection {
   func boot(routes: RoutesBuilder) throws {
     routes.post(use: authHandler)
+    
   }
 }
