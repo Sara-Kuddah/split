@@ -10,6 +10,17 @@ public func configure(_ app: Application) async throws {
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
     app.middleware.use(SessionsMiddleware(session: app.sessions.driver))
+    // Configure APNS using JWT authentication.
+    app.apns.configuration = try .init(
+        authenticationMethod: .jwt(
+            key: .private(filePath: "/Users/sarabinkuddah/Documents/split/AuthKey_85KUGUVDP4.p8"),
+            keyIdentifier: "85KUGUVDP4",
+            teamIdentifier: "F3J9926XAP"
+        ),
+         topic: "topic",
+         environment: .sandbox
+     )
+
     if let databaseURL = Environment.get("DATABASE_URL") {
         var tlsConfig: TLSConfiguration = .makeClientConfiguration()
         tlsConfig.certificateVerification = .none
@@ -20,29 +31,9 @@ public func configure(_ app: Application) async throws {
         
         app.databases.use(.postgres(configuration: postgresConfig), as: .psql)
         
-        // Configure APNS using JWT authentication.
-        app.apns.configuration = try .init(
-            authenticationMethod: .jwt(
-                key: .private(filePath: "/Users/sarabinkuddah/Documents/split/AuthKey_85KUGUVDP4.p8"),
-                keyIdentifier: "85KUGUVDP4",
-                teamIdentifier: "F3J9926XAP"
-            ),
-             topic: "topic",
-             environment: .sandbox
-         )
-
+        
     } else {
-        // Configure APNS using JWT authentication.
-        app.apns.configuration = try .init(
-            authenticationMethod: .jwt(
-                key: .private(filePath: "/Users/sarabinkuddah/Documents/split/AuthKey_85KUGUVDP4.p8"),
-                keyIdentifier: "85KUGUVDP4",
-                teamIdentifier: "F3J9926XAP"
-            ),
-             topic: "topic",
-             environment: .sandbox
-         )
-        // ...
+       
         app.databases.use(
             .postgres(
             hostname: Environment.get("DATABASE_HOST") ?? "localhost",
