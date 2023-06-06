@@ -8,6 +8,7 @@
 import Fluent
 import JWT
 import Vapor
+import APNSwift
 
 struct UserAPIController {
     //to return user info
@@ -16,7 +17,22 @@ struct UserAPIController {
         let user = try req.auth.require(User.self)
         return try .init(user: user)
     }
-    
+    func sendApns(req: Request)
+    async throws -> HTTPStatus {
+        let user = try req.auth.require(User.self)
+        let userID = try user.requireID()
+        let token = try await Token.query(on: req.db)
+            .filter(\.$user.$id == userID)
+            .first()
+        print("token :" , token?.$value.value.self!)
+        let alert = APNSwiftAlert(
+            title: "Hey There",
+            subtitle: "Full moon sighting",
+            body: "There was a full moon last night did you see it"
+        )
+        req.apns.send(alert, to: token?.$value.value.self! ?? <#default value#>)
+        return .ok
+    }
     //put user to post phone number
     // api/users/me/addphone
     func updateUserToAddPhoneNumber(req: Request) async throws -> User {
@@ -64,6 +80,7 @@ struct UserAPIController {
           routes.get("me", use: getMeHandler)
           routes.patch("me", "addphone" ,use: updateUserToAddPhoneNumber)
           routes.get("allaroundorder",":orderid" , use: getUsersAroundOrder)
+            routes.get("test-push" , use: sendApns)
        
       }
     }
