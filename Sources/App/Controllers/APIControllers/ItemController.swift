@@ -13,6 +13,7 @@ struct ItemController: RouteCollection {
         routes.post(":orderID", use: createItem)
         routes.get(":orderID", use: getItems)
         routes.get("get", use: getItemsInOrders)
+        routes.get("getAll",":orderID", use: getAllItems)
     }
     
     // maybe will be deleted if not necessary
@@ -47,20 +48,20 @@ struct ItemController: RouteCollection {
             .all()
     }
     // get all order's items
-//    func getAllItems(req: Request) async throws -> [Item] {
-//        let user = try req.auth.require(User.self)
+    func getAllItems(req: Request) async throws -> [Item] {
+        let user = try req.auth.require(User.self)
 //        let userID = try user.requireID()
-//        let orderID = try req.parameters.require("orderID", as: UUID.self)
-////        guard let order = try await Order.find(orderID, on: req.db)
-////              else {
-////                  throw Abort(.notFound, reason: "Order not found")
-////              }
-//        return try await Item.query(on: req.db)
-//            .join(Order.self, on: \Order.$id == \Item.$order.$id)
-//            .filter(\Item.$order.$id == orderID)
-//            .sort(Order.self, \.$createdAt)
-//            .all()
-//    }
+        let orderID = try req.parameters.require("orderID", as: UUID.self)
+//        guard let order = try await Order.find(orderID, on: req.db)
+//              else {
+//                  throw Abort(.notFound, reason: "Order not found")
+//              }
+        return try await Item.query(on: req.db)
+            .join(Order.self, on: \Order.$id == \Item.$order.$id)
+            .filter(\Item.$order.$id == orderID)
+            .sort(Order.self, \.$createdAt)
+            .all()
+    }
     
     func getItemsInOrders(req: Request) async throws -> [Order] {
         let user = try req.auth.require(User.self)
